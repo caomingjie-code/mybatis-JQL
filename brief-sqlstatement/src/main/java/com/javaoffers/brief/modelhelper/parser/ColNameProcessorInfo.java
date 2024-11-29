@@ -8,6 +8,8 @@ import com.javaoffers.thrid.jsqlparser.schema.Column;
  */
 public class ColNameProcessorInfo {
 
+    private String tableName;
+
     private Column column;
 
     private ConditionName conditionName;
@@ -36,5 +38,13 @@ public class ColNameProcessorInfo {
 
     public void setColumnIndex(int columnIndex) {
         this.columnIndex = columnIndex;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }

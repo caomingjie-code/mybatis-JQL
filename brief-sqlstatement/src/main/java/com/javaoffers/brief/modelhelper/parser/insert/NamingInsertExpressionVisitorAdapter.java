@@ -31,6 +31,7 @@ public class NamingInsertExpressionVisitorAdapter extends ExpressionVisitorAdapt
             Column column = new Column(new Table(insertTableName), "?");
             colNameProcessorInfo.setColumn(column);
             colNameProcessorInfo.setColumnIndex(index);
+            colNameProcessorInfo.setTableName(insertTableName);
             this.namingContent
                     .getProcessorByTableName(insertTableName)
                     .accept(colNameProcessorInfo);

@@ -40,6 +40,7 @@ public class NamingSelectExpressionVisitorAdapter extends ExpressionVisitorAdapt
         colNameProcessorInfo.setColumn(column);
         colNameProcessorInfo.setConditionName(conditionName);
         colNameProcessorInfo.setColumnIndex(whereIndex.getAndIncrement());
+        colNameProcessorInfo.setTableName(tableName);
         // 如果存在tableName不为空
         if (StringUtils.isNotBlank(tableName)) {
             //如果表与checkTableName相同，colName也相同

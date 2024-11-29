@@ -40,6 +40,7 @@ public class NamingUpdateExpressionVisitorAdapter extends ExpressionVisitorAdapt
                 colNameProcessorInfo.setColumn(column);
                 colNameProcessorInfo.setConditionName(this.conditionName);
                 colNameProcessorInfo.setColumnIndex(whereIndex.getAndIncrement());
+                colNameProcessorInfo.setTableName(updateTableName);
                 this.namingContent.getProcessorByTableName(updateTableName).accept(colNameProcessorInfo);
             }
         }

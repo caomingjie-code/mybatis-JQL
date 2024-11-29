@@ -38,6 +38,7 @@ public class NamingDeleteExpressionVisitorAdapter extends ExpressionVisitorAdapt
                 colNameProcessorInfo.setColumn(column);
                 colNameProcessorInfo.setConditionName(this.conditionName);
                 colNameProcessorInfo.setColumnIndex(whereIndex.getAndIncrement());
+                colNameProcessorInfo.setTableName(deleteTableName);
                 this.namingContent.getProcessorByTableName(deleteTableName).accept(colNameProcessorInfo);
             }
         }
