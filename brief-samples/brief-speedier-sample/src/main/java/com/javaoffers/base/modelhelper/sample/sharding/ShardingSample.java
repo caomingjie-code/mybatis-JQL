@@ -13,6 +13,9 @@ public class ShardingSample {
     public void testShardingSample(){
         BriefSpeedier briefSpeedier = BriefSpeedierSample.getBriefSpeedier();
         BriefMapper<ShardingUser> userBriefMapper = briefSpeedier.newDefaultBriefMapper(ShardingUser.class);
-        userBriefMapper.select().colAll().where().eq(ShardingUser::getBirthday, new Date()).exs();
+        userBriefMapper.select().colAll().where()
+                .notIn(ShardingUser::getBirthday, new Date())
+                .notIn(ShardingUser::getId,1)
+                .exs();
     }
 }

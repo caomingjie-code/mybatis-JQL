@@ -12,6 +12,8 @@ public class ColNameProcessorInfo {
 
     private ConditionName conditionName;
 
+    private int columnIndex;
+
     public Column getColumn() {
         return column;
     }
@@ -26,5 +28,13 @@ public class ColNameProcessorInfo {
 
     public void setConditionName(ConditionName conditionName) {
         this.conditionName = conditionName;
+    }
+
+    public int getColumnIndex() {
+        return columnIndex;
+    }
+
+    public void setColumnIndex(int columnIndex) {
+        this.columnIndex = columnIndex;
     }
 }

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author mingJie
@@ -17,6 +18,8 @@ public class NamingSelectExpressionVisitorAdapter extends ExpressionVisitorAdapt
 
     private ConditionName conditionName;
     private NamingSelectContent namingContent;
+    //where colName的位置。where a=xx and b=xx. a的位置是0，b的位置是1. 负数<0表示无效
+    private AtomicInteger whereIndex = new AtomicInteger(Integer.MIN_VALUE);
 
     /**
      * select columns, where columns. 这个方法代表真实的表字段.
@@ -36,6 +39,7 @@ public class NamingSelectExpressionVisitorAdapter extends ExpressionVisitorAdapt
         ColNameProcessorInfo colNameProcessorInfo = new ColNameProcessorInfo();
         colNameProcessorInfo.setColumn(column);
         colNameProcessorInfo.setConditionName(conditionName);
+        colNameProcessorInfo.setColumnIndex(whereIndex.getAndIncrement());
         // 如果存在tableName不为空
         if (StringUtils.isNotBlank(tableName)) {
             //如果表与checkTableName相同，colName也相同
@@ -120,5 +124,8 @@ public class NamingSelectExpressionVisitorAdapter extends ExpressionVisitorAdapt
     public NamingSelectExpressionVisitorAdapter(ConditionName name, NamingSelectContent namingContent) {
         this.conditionName = name;
         this.namingContent = namingContent;
+        if(ConditionName.isWhereOnName(name)){
+            whereIndex = new AtomicInteger(0);
+        }
     }
 }

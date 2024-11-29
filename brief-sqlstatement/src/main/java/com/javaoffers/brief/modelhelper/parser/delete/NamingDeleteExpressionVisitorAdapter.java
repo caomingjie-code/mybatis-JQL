@@ -12,6 +12,7 @@ import com.javaoffers.thrid.jsqlparser.statement.select.SubSelect;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author mingJie
@@ -20,6 +21,8 @@ public class NamingDeleteExpressionVisitorAdapter extends ExpressionVisitorAdapt
 
     private ConditionName conditionName;
     private NamingSelectContent namingContent;
+    //where colName的位置。where a=xx and b=xx. a的位置是0，b的位置是1. 负数<0表示无效
+    private AtomicInteger whereIndex = new AtomicInteger(Integer.MIN_VALUE);
 
     /**
      * 处理wehere colName = ? and xxx = xxx
@@ -34,6 +37,7 @@ public class NamingDeleteExpressionVisitorAdapter extends ExpressionVisitorAdapt
                 ColNameProcessorInfo colNameProcessorInfo = new ColNameProcessorInfo();
                 colNameProcessorInfo.setColumn(column);
                 colNameProcessorInfo.setConditionName(this.conditionName);
+                colNameProcessorInfo.setColumnIndex(whereIndex.getAndIncrement());
                 this.namingContent.getProcessorByTableName(deleteTableName).accept(colNameProcessorInfo);
             }
         }
@@ -63,5 +67,8 @@ public class NamingDeleteExpressionVisitorAdapter extends ExpressionVisitorAdapt
     public NamingDeleteExpressionVisitorAdapter(ConditionName name, NamingSelectContent namingContent) {
         this.conditionName = name;
         this.namingContent = namingContent;
+        if (ConditionName.isWhereOnName(name)) {
+            whereIndex = new AtomicInteger(0);
+        }
     }
 }

@@ -30,6 +30,7 @@ public class NamingInsertExpressionVisitorAdapter extends ExpressionVisitorAdapt
             colNameProcessorInfo.setConditionName(ConditionName.VALUES);
             Column column = new Column(new Table(insertTableName), "?");
             colNameProcessorInfo.setColumn(column);
+            colNameProcessorInfo.setColumnIndex(index);
             this.namingContent
                     .getProcessorByTableName(insertTableName)
                     .accept(colNameProcessorInfo);
