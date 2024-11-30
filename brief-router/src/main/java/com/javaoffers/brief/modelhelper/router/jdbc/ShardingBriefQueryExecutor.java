@@ -61,7 +61,13 @@ public class ShardingBriefQueryExecutor<T> implements QueryExecutor<T> {
         TableInfo tableInfo = TableHelper.getTableInfo(this.modelClass);
         ShardingTableColumInfo stc = (ShardingTableColumInfo)tableInfo.getDeriveColName(ShardingDeriveFlag.SHARDING_TABLE);
         if(stc != null){
+            int querySize = sql.querySize();
             List<BaseSQLInfo> baseSQLInfos = stc.shardingParse(sql);
+            if(CollectionUtils.isEmpty(baseSQLInfos)){
+                normal(sql);
+            } else {
+
+            }
 
 
         }else{

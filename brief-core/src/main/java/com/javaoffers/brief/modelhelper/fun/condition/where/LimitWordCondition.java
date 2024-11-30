@@ -1,6 +1,7 @@
 package com.javaoffers.brief.modelhelper.fun.condition.where;
 
 import com.javaoffers.brief.modelhelper.fun.ConditionTag;
+import com.javaoffers.brief.modelhelper.fun.HeadCondition;
 import com.javaoffers.brief.modelhelper.fun.condition.IgnoreAndOrWordCondition;
 
 /**
@@ -29,6 +30,8 @@ public class LimitWordCondition<V> extends WhereOnCondition<V> implements Ignore
         this.startIndex = (pageNum-1) * pageSize;
         this.len = pageSize;
         cleanAndOrTag();
+        HeadCondition headCondition = getHeadCondition();
+        headCondition.setQuerySize(pageSize);
     }
 
     @Override

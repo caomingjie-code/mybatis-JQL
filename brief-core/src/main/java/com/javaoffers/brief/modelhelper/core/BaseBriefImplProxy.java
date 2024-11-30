@@ -125,4 +125,8 @@ public class BaseBriefImplProxy<T, ID> implements BaseBrief<T> , BriefContextAwa
         SmartBriefContext smartBriefContext = (SmartBriefContext) briefContext;
         jqlExecutorChains =  smartBriefContext.getJqlExecutorFilters();
     }
+
+    public BaseBrief getOrgBaseBrief(){
+        return this.baseBrief;
+    }
 }

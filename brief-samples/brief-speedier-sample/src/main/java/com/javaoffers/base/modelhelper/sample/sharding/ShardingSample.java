@@ -3,19 +3,37 @@ package com.javaoffers.base.modelhelper.sample.sharding;
 import com.javaoffers.base.modelhelper.sample.speedier.BriefSpeedierSample;
 import com.javaoffers.brief.modelhelper.mapper.BriefMapper;
 import com.javaoffers.brief.modelhelper.speedier.BriefSpeedier;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
 
 import java.util.Date;
 
 public class ShardingSample {
+    BriefSpeedier briefSpeedier = BriefSpeedierSample.getBriefSpeedier();
+    BriefMapper<ShardingUser> userBriefMapper = briefSpeedier.newDefaultBriefMapper(ShardingUser.class);
 
     @Test
-    public void testShardingSample(){
-        BriefSpeedier briefSpeedier = BriefSpeedierSample.getBriefSpeedier();
-        BriefMapper<ShardingUser> userBriefMapper = briefSpeedier.newDefaultBriefMapper(ShardingUser.class);
+    public void testShardingSampleEq(){
         userBriefMapper.select().colAll().where()
-                .notIn(ShardingUser::getBirthday, new Date())
-                .notIn(ShardingUser::getId,1)
+                .eq(ShardingUser::getBirthday, new Date())
+                .eq(ShardingUser::getId,1)
+                .exs();
+    }
+
+    @Test
+    public void testShardingSampleIn(){
+        userBriefMapper.select().colAll().where()
+                .in(ShardingUser::getBirthday, new Date(), new Date())
+                .eq(ShardingUser::getId,1)
+                .exs();
+    }
+
+    @Test
+    public void testShardingSampleIn2(){
+        userBriefMapper.select().colAll().where()
+                .in(ShardingUser::getBirthday, new Date(), DateUtils.addDays(new Date(), -31))
+                .eq(ShardingUser::getId,1)
                 .exs();
     }
 }

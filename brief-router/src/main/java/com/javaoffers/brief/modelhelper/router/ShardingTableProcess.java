@@ -40,6 +40,7 @@ public class ShardingTableProcess implements Consumer<ColNameProcessorInfo> {
         BaseSQLInfo sourceSqlInfo = shardingTableColumInfo.getSourceSqlInfo();
         Column column = colNameProcessorInfo.getColumn();
         ConditionTag conditionTag = null;
+        int argsSize = 0;
         if (ConditionName.isWhereOnName(colNameProcessorInfo.getConditionName())) {
             Token token = column.getASTNode().jjtGetLastToken().next;
             StringBuilder condition = new StringBuilder();
@@ -51,28 +52,45 @@ public class ShardingTableProcess implements Consumer<ColNameProcessorInfo> {
                 }
                 token = token.next;
             }
+
+            switch (conditionTag) {
+                case EQ:
+                    argsSize = 1;
+                    break;
+                case IN:
+                    while (token != null) {
+                        String item = token.toString().trim();
+                        if(item.equals("?")){
+                            ++argsSize;
+                        } else if(item.equals(")")){
+                            break;
+                        }
+                        token = token.next;
+                    }
+                    break;
+            }
         }
 
         int columnIndex = colNameProcessorInfo.getColumnIndex();
         ConditionName conditionName = colNameProcessorInfo.getConditionName();
         String columnName = column.getColumnName();
         List<Object[]> argsParam = sourceSqlInfo.getArgsParam();
-        List<Map<String, Object>> params = sourceSqlInfo.getParams();
-
+        List<BaseSQLInfo> sqlInfos = new ArrayList<>();
         for (Object[] arg : argsParam) {
             if (ConditionName.isWhereOnName(conditionName)) {
-//            if(column.getTable() != null && StringUtils.isNotBlank(column.getTable().getName())){
-//                column.setColumnName("解密("+column.getTable().getName()+"."+columnName.toUpperCase()+")");
-//                column.setTable(new Table(""));
-//            }else{
-//                column.setColumnName("解密("+columnName.toUpperCase()+")");
-//            }
                 ArrayList<Object> value = new ArrayList<>();
-                value.add(arg[columnIndex]);
-                shardingTableStrategy.shardingTable(colNameProcessorInfo.getTableName(),
-                        columnName, conditionTag, value);
-
-
+                for(int i=0; i < argsSize; i++) {
+                    value.add(arg[columnIndex+i]);
+                }
+                String orgTableName = colNameProcessorInfo.getTableName();
+                List<String> list = shardingTableStrategy.shardingTable(orgTableName, columnName, conditionTag, value);
+                String orgSql = sourceSqlInfo.getSql();
+                for(String shardingTableName : list) {
+                    BaseSQLInfo clone = sourceSqlInfo.clone();
+                    clone.resetSql(orgSql.replaceAll(orgTableName+"\\.", shardingTableName+"\\."));
+                    sqlInfos.add(clone);
+                }
+                shardingTableColumInfo.setShardingSqlInfo(sqlInfos);
             } else if (ConditionName.VALUES == conditionName) {
                 column.setColumnName("加密(" + columnName + ")");
             } else if (ConditionName.UPDATE_SET == conditionName) {

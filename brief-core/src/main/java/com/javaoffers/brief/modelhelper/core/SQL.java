@@ -23,6 +23,7 @@ public class SQL implements  BaseSQLInfo{
 	SQLType sqlType;
 	DBType dbType;
 	Consumer consumer;
+	private int querySize;
 	public SQL(DBType dbType, String sql , List<Object[]> argsParam) {
 		this.argsParam = argsParam;
 		this.sql = sql;
@@ -85,5 +86,23 @@ public class SQL implements  BaseSQLInfo{
 
 	public void setParamMap(List<Map<String, Object>> paramMap) {
 		this.paramMap = paramMap;
+	}
+
+	public SQL clone(){
+		SQL clone = new SQL(dbType, sql, argsParam);
+		clone.setSqlType(sqlType);
+		clone.setStreaming(consumer);
+		clone.setParamMap(paramMap);
+		clone.querySize(querySize);
+		return clone;
+	}
+
+	@Override
+	public int querySize() {
+		return querySize;
+	}
+
+	public void querySize(int querySize) {
+		this.querySize = querySize;
 	}
 }

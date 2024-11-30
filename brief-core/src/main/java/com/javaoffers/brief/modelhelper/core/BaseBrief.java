@@ -27,7 +27,9 @@ public interface BaseBrief<T>{
 
 	public int updateData(String sql,Map<String,Object> map);
 	
-	/*****************************************************************************/ 
+	/*****************************************************************************/
+	default public int querySize(){return 0;}
+
 	public List<T> queryData(String sql);
 
 	public List<T> queryData(String sql,Map<String,Object> map);

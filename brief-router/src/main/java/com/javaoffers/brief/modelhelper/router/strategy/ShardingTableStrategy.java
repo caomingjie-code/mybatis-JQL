@@ -9,5 +9,5 @@ import java.util.List;
  * T: 值的类型
  */
 public interface ShardingTableStrategy<T> {
-    public List<String> shardingTable(String tableName, String colName, ConditionTag conditionTag, List<T> value);
+    public List<String> shardingTable(String tableName, String colName, ConditionTag conditionTag, List<T> args);
 }

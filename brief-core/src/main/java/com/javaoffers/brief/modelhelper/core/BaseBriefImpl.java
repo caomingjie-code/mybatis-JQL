@@ -29,16 +29,15 @@ public class BaseBriefImpl<T, ID> implements BaseBrief<T>, BriefContextAware {
 
     private DBType dbType;
 
+    private int querySize;
+
     public BaseBriefImpl() {
     }
 
     public static <T, ID> BaseBrief getInstance(HeadCondition headCondition) {
-        return getInstance(headCondition.getDataSource(), headCondition.getModelClass());
-    }
-
-    private static <T, ID> BaseBrief getInstance(DataSource dataSource, Class mClass) {
-        BaseBriefImpl batis = new BaseBriefImpl(dataSource,mClass);
-        return new BaseBriefImplProxy(batis, mClass);
+        BaseBriefImpl baseBrief = new BaseBriefImpl(headCondition.getDataSource(), headCondition.getModelClass());
+        baseBrief.querySize = headCondition.getQuerySize();
+        return new BaseBriefImplProxy(baseBrief, baseBrief.getClass());
     }
 
     private BaseBriefImpl(DataSource dataSource, Class modelClass) {
@@ -87,6 +86,7 @@ public class BaseBriefImpl<T, ID> implements BaseBrief<T>, BriefContextAware {
         List<Map<String, Object>> paramMapList = new ArrayList<>();
         paramMapList.add(paramMap);
         SQL querySql = SQLParse.parseSqlParams(this.dbType, sql, paramMapList);
+        querySql.querySize(this.querySize);
         return this.jdbcExecutor.queryList(querySql);
     }
 
@@ -96,6 +96,7 @@ public class BaseBriefImpl<T, ID> implements BaseBrief<T>, BriefContextAware {
         paramMapList.add(paramMap);
         SQL querySql = SQLParse.parseSqlParams(this.dbType, sql, paramMapList);
         querySql.setStreaming(consumer);
+        querySql.querySize(this.querySize);
         this.jdbcExecutor.queryStream(querySql);
     }
 
@@ -110,6 +111,7 @@ public class BaseBriefImpl<T, ID> implements BaseBrief<T>, BriefContextAware {
         paramMapList.add(paramMap);
         SQL querySql = SQLParse.parseSqlParams(this.dbType, sql, paramMapList);
         querySql.setSqlType(sqlType);
+        querySql.querySize(this.querySize);
         return (List) this.jdbcExecutor.queryList(querySql);
     }
 

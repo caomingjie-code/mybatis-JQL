@@ -3,9 +3,7 @@ package com.javaoffers.base.modelhelper.sample.sharding;
 import com.javaoffers.brief.modelhelper.anno.BaseModel;
 import com.javaoffers.brief.modelhelper.anno.BaseUnique;
 import com.javaoffers.brief.modelhelper.router.anno.ShardingStrategy;
-import com.javaoffers.brief.modelhelper.router.strategy.ShardingTableEqStrategy;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import com.javaoffers.brief.modelhelper.router.strategy.ShardingTableMonthStrategy;
 import lombok.Data;
 
 import java.util.Date;
@@ -19,6 +17,6 @@ public class ShardingUser {
 
     private String name;
 
-    @ShardingStrategy(shardingTableStrategy=ShardingTableEqStrategy.class)
+    @ShardingStrategy(shardingTableStrategy= ShardingTableMonthStrategy.class)
     private Date birthday;
 }

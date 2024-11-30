@@ -25,7 +25,11 @@ public class ShardingTableColumInfo extends DeriveInfo {
         try {
             task.set(sqlInfo);
             sqlParserProcessor.parseSql(sql);
-            return (List)task.get();
+            List<BaseSQLInfo> sharding = (List)task.get();
+            if(sharding == null || sharding.size() == 0){
+                return Lists.newArrayList(sqlInfo);
+            }
+            return sharding;
         } catch (JSQLParserException e) {
             throw new RuntimeException(e);
         }finally {

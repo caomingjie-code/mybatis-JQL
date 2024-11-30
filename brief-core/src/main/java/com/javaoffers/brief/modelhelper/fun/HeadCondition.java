@@ -21,6 +21,8 @@ public class HeadCondition implements Condition {
 
     private Class modelClass;
 
+    private int querySize;
+
     public HeadCondition(DataSource dataSource, Class modelClass) {
         this.dataSource = dataSource;
         this.modelClass = modelClass;
@@ -59,5 +61,13 @@ public class HeadCondition implements Condition {
 
     public Class getModelClass() {
         return modelClass;
+    }
+
+    public int getQuerySize() {
+        return querySize;
+    }
+
+    public void setQuerySize(int querySize) {
+        this.querySize = querySize;
     }
 }
