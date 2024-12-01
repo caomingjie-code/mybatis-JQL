@@ -73,6 +73,9 @@ public class ShardingTableProcess implements Consumer<ColNameProcessorInfo> {
                         token = token.next;
                     }
                     break;
+
+                default:
+                    return;
             }
         }
         int columnIndex = colNameProcessorInfo.getColumnIndex();

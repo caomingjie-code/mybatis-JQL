@@ -35,7 +35,15 @@ public class ShardingSample {
     public void testShardingSampleIn2(){
         List<ShardingUser> exs = userBriefMapper.select().colAll().where()
                 .in(ShardingUser::getBirthday, new Date(), DateUtils.addDays(new Date(), -31))
-//                .eq(ShardingUser::getId, 1)
+                .exs();
+        System.out.println(exs.size());
+    }
+
+    @Test
+    public void testShardingSampleGt(){
+        List<ShardingUser> exs = userBriefMapper.select().colAll().where()
+                .gtEq(ShardingUser::getBirthday,  DateUtils.addDays(new Date(), -31))
+                .ltEq(ShardingUser::getBirthday,  new Date())
                 .exs();
         System.out.println(exs.size());
     }

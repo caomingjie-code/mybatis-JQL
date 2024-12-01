@@ -51,7 +51,7 @@ public class ShardingBriefQueryExecutor<T> implements QueryExecutor<T> {
         List<T> ts = Lists.newArrayList();
         Limit limit = sql.limit();
         int startIndexInt = limit==null ? 0: limit.startIndex();
-        int lenInt = limit == null ? Integer.MIN_VALUE : limit.len();
+        int lenInt = limit == null ? Integer.MAX_VALUE : limit.len();
         AtomicInteger startIndex = new AtomicInteger(startIndexInt);
         AtomicInteger len = new AtomicInteger(lenInt);
         sql.setStreaming(data->{
