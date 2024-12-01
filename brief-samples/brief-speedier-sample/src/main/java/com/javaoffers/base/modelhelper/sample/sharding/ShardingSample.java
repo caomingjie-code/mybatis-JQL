@@ -47,4 +47,12 @@ public class ShardingSample {
                 .exs();
         System.out.println(exs.size());
     }
+
+    @Test
+    public void testShardingSampleBetween(){
+        List<ShardingUser> exs = userBriefMapper.select().colAll().where()
+                .between(ShardingUser::getBirthday,  DateUtils.addDays(new Date(), -31), new Date())
+                .exs();
+        System.out.println(exs.size());
+    }
 }

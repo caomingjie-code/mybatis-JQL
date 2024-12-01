@@ -59,6 +59,9 @@ public class ShardingTableProcess implements Consumer<ColNameProcessorInfo> {
             }
 
             switch (conditionTag) {
+                case BETWEEN:
+                    argsSize = 2;
+                 break;
                 case EQ:
                     argsSize = 1;
                     break;
@@ -73,7 +76,6 @@ public class ShardingTableProcess implements Consumer<ColNameProcessorInfo> {
                         token = token.next;
                     }
                     break;
-
                 default:
                     return;
             }
