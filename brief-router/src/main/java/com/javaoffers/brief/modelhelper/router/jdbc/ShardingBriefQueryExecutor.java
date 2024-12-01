@@ -1,26 +1,26 @@
 package com.javaoffers.brief.modelhelper.router.jdbc;
 
-import com.javaoffers.brief.modelhelper.anno.derive.flag.DeriveInfo;
 import com.javaoffers.brief.modelhelper.core.BaseSQLInfo;
+import com.javaoffers.brief.modelhelper.core.Limit;
 import com.javaoffers.brief.modelhelper.exception.ParseResultSetException;
 import com.javaoffers.brief.modelhelper.exception.SqlParseException;
+import com.javaoffers.brief.modelhelper.exception.StopExecException;
 import com.javaoffers.brief.modelhelper.jdbc.BriefResultSetExecutor;
 import com.javaoffers.brief.modelhelper.jdbc.QueryExecutor;
+import com.javaoffers.brief.modelhelper.log.JqlLogger;
 import com.javaoffers.brief.modelhelper.parse.ModelParseUtils;
 import com.javaoffers.brief.modelhelper.router.ShardingDeriveFlag;
 import com.javaoffers.brief.modelhelper.router.strategy.ShardingTableColumInfo;
 import com.javaoffers.brief.modelhelper.utils.Lists;
 import com.javaoffers.brief.modelhelper.utils.TableHelper;
 import com.javaoffers.brief.modelhelper.utils.TableInfo;
-import com.javaoffers.thrid.jsqlparser.JSQLParserException;
 import org.apache.commons.collections4.CollectionUtils;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @description:
@@ -49,8 +49,20 @@ public class ShardingBriefQueryExecutor<T> implements QueryExecutor<T> {
     @Override
     public List<T> queryList(BaseSQLInfo sql) {
         List<T> ts = Lists.newArrayList();
+        Limit limit = sql.limit();
+        int startIndexInt = limit==null ? 0: limit.startIndex();
+        int lenInt = limit == null ? Integer.MIN_VALUE : limit.len();
+        AtomicInteger startIndex = new AtomicInteger(startIndexInt);
+        AtomicInteger len = new AtomicInteger(lenInt);
         sql.setStreaming(data->{
-            ts.add((T)data);
+            if(startIndex.get() ==0 && len.get() > 0){
+                ts.add((T)data);
+                len.getAndDecrement();
+                return;
+            }else if(len.get() == 0){
+                throw new StopExecException("LIMIT DONE");
+            }
+            startIndex.getAndDecrement();
         });
         queryStream(sql);
         return ts;
@@ -60,23 +72,27 @@ public class ShardingBriefQueryExecutor<T> implements QueryExecutor<T> {
     public void queryStream(BaseSQLInfo sql) {
         TableInfo tableInfo = TableHelper.getTableInfo(this.modelClass);
         ShardingTableColumInfo stc = (ShardingTableColumInfo)tableInfo.getDeriveColName(ShardingDeriveFlag.SHARDING_TABLE);
-        if(stc != null){
-            int querySize = sql.querySize();
-            List<BaseSQLInfo> baseSQLInfos = stc.shardingParse(sql);
-            if(CollectionUtils.isEmpty(baseSQLInfos)){
+        try {
+            if(stc != null) {
+                List<BaseSQLInfo> baseSQLInfos = stc.shardingParse(sql);
+                if(CollectionUtils.isEmpty(baseSQLInfos)){
+                    normal(sql);
+                } else {
+                    for(BaseSQLInfo baseSQLInfo : baseSQLInfos){
+                        normal(baseSQLInfo);
+                    }
+                }
+            }else{
                 normal(sql);
-            } else {
-
             }
-
-
-        }else{
-            normal(sql);
+        }catch (StopExecException e){
+            //ignore
         }
-
     }
 
     private void normal(BaseSQLInfo sql) {
+        JqlLogger.infoSql("SHARDING SQL: {}", sql.getSql());
+        JqlLogger.infoSql("SHARDING PAM: {}", sql.getParams());
         boolean oldAutoCommitStatus = false;
         Connection connection = null;
         try {
@@ -104,6 +120,9 @@ public class ShardingBriefQueryExecutor<T> implements QueryExecutor<T> {
                     throw new ParseResultSetException("sql type does not exist for streaming process");
             }
         } catch (Exception e) {
+            if(e instanceof StopExecException){
+                throw (StopExecException)e;
+            }
             e.printStackTrace();
             throw new SqlParseException(e.getMessage());
         } finally {

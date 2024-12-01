@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.18</version>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <!-- mysql6 链接 -->

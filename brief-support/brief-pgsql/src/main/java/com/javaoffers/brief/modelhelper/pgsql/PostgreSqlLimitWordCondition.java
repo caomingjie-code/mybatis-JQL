@@ -21,4 +21,10 @@ public class PostgreSqlLimitWordCondition extends LimitWordCondition {
         return getTag().getTag() +" #{"+lenTag+"} offset #{"+startIndexTag+"}";
     }
 
+    @Override
+    public String cleanLimit(String limitSql) {
+        String token = getTag().getTag() +" ? offset ?";
+        limitSql = limitSql.substring(0, limitSql.length() - token.length());
+        return limitSql;
+    }
 }

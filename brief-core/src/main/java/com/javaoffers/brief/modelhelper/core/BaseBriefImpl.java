@@ -2,6 +2,7 @@ package com.javaoffers.brief.modelhelper.core;
 
 import com.javaoffers.brief.modelhelper.context.*;
 import com.javaoffers.brief.modelhelper.fun.HeadCondition;
+import com.javaoffers.brief.modelhelper.fun.condition.where.LimitWordCondition;
 import com.javaoffers.brief.modelhelper.jdbc.JdbcExecutor;
 import com.javaoffers.brief.modelhelper.jdbc.JdbcExecutorFactory;
 import com.javaoffers.brief.modelhelper.parser.StatementParser;
@@ -29,15 +30,15 @@ public class BaseBriefImpl<T, ID> implements BaseBrief<T>, BriefContextAware {
 
     private DBType dbType;
 
-    private int querySize;
+    private Limit limit;
 
     public BaseBriefImpl() {
     }
 
     public static <T, ID> BaseBrief getInstance(HeadCondition headCondition) {
         BaseBriefImpl baseBrief = new BaseBriefImpl(headCondition.getDataSource(), headCondition.getModelClass());
-        baseBrief.querySize = headCondition.getQuerySize();
-        return new BaseBriefImplProxy(baseBrief, baseBrief.getClass());
+        baseBrief.limit = headCondition.getLimitWordCondition();
+        return new BaseBriefImplProxy(baseBrief, headCondition.getModelClass());
     }
 
     private BaseBriefImpl(DataSource dataSource, Class modelClass) {
@@ -86,7 +87,7 @@ public class BaseBriefImpl<T, ID> implements BaseBrief<T>, BriefContextAware {
         List<Map<String, Object>> paramMapList = new ArrayList<>();
         paramMapList.add(paramMap);
         SQL querySql = SQLParse.parseSqlParams(this.dbType, sql, paramMapList);
-        querySql.querySize(this.querySize);
+        querySql.limit(this.limit);
         return this.jdbcExecutor.queryList(querySql);
     }
 
@@ -96,7 +97,7 @@ public class BaseBriefImpl<T, ID> implements BaseBrief<T>, BriefContextAware {
         paramMapList.add(paramMap);
         SQL querySql = SQLParse.parseSqlParams(this.dbType, sql, paramMapList);
         querySql.setStreaming(consumer);
-        querySql.querySize(this.querySize);
+        querySql.limit(this.limit);
         this.jdbcExecutor.queryStream(querySql);
     }
 
@@ -111,7 +112,7 @@ public class BaseBriefImpl<T, ID> implements BaseBrief<T>, BriefContextAware {
         paramMapList.add(paramMap);
         SQL querySql = SQLParse.parseSqlParams(this.dbType, sql, paramMapList);
         querySql.setSqlType(sqlType);
-        querySql.querySize(this.querySize);
+        querySql.limit(this.limit);
         return (List) this.jdbcExecutor.queryList(querySql);
     }
 

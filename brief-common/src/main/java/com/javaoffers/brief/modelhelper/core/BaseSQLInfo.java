@@ -18,5 +18,5 @@ public interface BaseSQLInfo {
     public Consumer getStreaming();
     public void setStreaming(Consumer consumer);
     public BaseSQLInfo clone();
-    public int querySize();
+    public Limit limit();
 }

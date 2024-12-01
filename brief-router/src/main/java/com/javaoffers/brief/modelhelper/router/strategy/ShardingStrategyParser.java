@@ -1,11 +1,14 @@
 package com.javaoffers.brief.modelhelper.router.strategy;
 
 import com.javaoffers.brief.modelhelper.context.DeriveProcess;
+import com.javaoffers.brief.modelhelper.exception.ShardingConfigExecException;
+import com.javaoffers.brief.modelhelper.exception.StopExecException;
 import com.javaoffers.brief.modelhelper.parser.SqlParserProcessor;
 import com.javaoffers.brief.modelhelper.router.ShardingDeriveFlag;
 import com.javaoffers.brief.modelhelper.router.ShardingTableProcess;
 import com.javaoffers.brief.modelhelper.router.anno.ShardingStrategy;
 import com.javaoffers.brief.modelhelper.utils.TableInfo;
+import com.javaoffers.brief.modelhelper.utils.Utils;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -15,6 +18,9 @@ public class ShardingStrategyParser implements DeriveProcess {
     static Map<Class, ShardingTableStrategy> shardingStrategyMap = new HashMap<>();
     @Override
     public synchronized void processDerive(TableInfo tableInfo, Field colF, String colName) {
+        if(colName.contains(")")){
+            throw new ShardingConfigExecException(colName + ", function is not supported");
+        }
         ShardingStrategy strategy = colF.getDeclaredAnnotation(ShardingStrategy.class);
         if(strategy != null){
             Class<? extends ShardingTableStrategy> tableStrategyClass = strategy.shardingTableStrategy();

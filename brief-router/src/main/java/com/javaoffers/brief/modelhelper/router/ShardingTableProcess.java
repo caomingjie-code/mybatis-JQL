@@ -1,6 +1,7 @@
 package com.javaoffers.brief.modelhelper.router;
 
 import com.javaoffers.brief.modelhelper.core.BaseSQLInfo;
+import com.javaoffers.brief.modelhelper.core.Limit;
 import com.javaoffers.brief.modelhelper.fun.ConditionTag;
 import com.javaoffers.brief.modelhelper.parser.ColNameProcessorInfo;
 import com.javaoffers.brief.modelhelper.parser.ConditionName;
@@ -33,11 +34,15 @@ public class ShardingTableProcess implements Consumer<ColNameProcessorInfo> {
         }
         ConditionTag[] values = ConditionTag.values();
         Map<String, ConditionTag> conditionTagMap = new HashMap<>(16);
+
         for (ConditionTag conditionTag : values) {
-            conditionTagMap.put(conditionTag.getTag().replaceAll(" ", "").toLowerCase(), conditionTag);
+            if(conditionTag.getCode() == ConditionTag.EQ.getCode()){
+                conditionTagMap.put(conditionTag.getTag().replaceAll(" ", "").toLowerCase(), conditionTag);
+            }
         }
 
         BaseSQLInfo sourceSqlInfo = shardingTableColumInfo.getSourceSqlInfo();
+        Limit limit = sourceSqlInfo.limit();
         Column column = colNameProcessorInfo.getColumn();
         ConditionTag conditionTag = null;
         int argsSize = 0;
@@ -70,7 +75,6 @@ public class ShardingTableProcess implements Consumer<ColNameProcessorInfo> {
                     break;
             }
         }
-
         int columnIndex = colNameProcessorInfo.getColumnIndex();
         ConditionName conditionName = colNameProcessorInfo.getConditionName();
         String columnName = column.getColumnName();
@@ -84,16 +88,26 @@ public class ShardingTableProcess implements Consumer<ColNameProcessorInfo> {
                 }
                 String orgTableName = colNameProcessorInfo.getTableName();
                 List<String> list = shardingTableStrategy.shardingTable(orgTableName, columnName, conditionTag, value);
-                String orgSql = sourceSqlInfo.getSql();
+                String removeLimitSql = sourceSqlInfo.getSql();
+                if(limit != null){
+                    removeLimitSql = limit.cleanLimit(removeLimitSql);
+                }
+
                 for(String shardingTableName : list) {
                     BaseSQLInfo clone = sourceSqlInfo.clone();
-                    clone.resetSql(orgSql.replaceAll(orgTableName+"\\.", shardingTableName+"\\."));
+                    String shardingTableSql = removeLimitSql.replaceAll(orgTableName+"\\.", shardingTableName+"\\.");
+                    String fromTable = ConditionTag.SELECT_FROM.getTag() +" "+ orgTableName+" ";
+                    shardingTableSql = shardingTableSql.replaceAll(fromTable,
+                            ConditionTag.SELECT_FROM.getTag() +" "+ shardingTableName+" ");
+                    clone.resetSql(shardingTableSql);
                     sqlInfos.add(clone);
                 }
                 shardingTableColumInfo.setShardingSqlInfo(sqlInfos);
             } else if (ConditionName.VALUES == conditionName) {
+
                 column.setColumnName("加密(" + columnName + ")");
             } else if (ConditionName.UPDATE_SET == conditionName) {
+
                 column.setColumnName("加密(" + columnName + ")");
             }
         }

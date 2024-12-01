@@ -1,5 +1,6 @@
 package com.javaoffers.brief.modelhelper.fun;
 
+import com.javaoffers.brief.modelhelper.fun.condition.where.LimitWordCondition;
 import com.javaoffers.brief.modelhelper.utils.DBType;
 import com.javaoffers.brief.modelhelper.utils.ModelInfo;
 import com.javaoffers.brief.modelhelper.utils.TableHelper;
@@ -21,7 +22,7 @@ public class HeadCondition implements Condition {
 
     private Class modelClass;
 
-    private int querySize;
+    private LimitWordCondition limitWordCondition;
 
     public HeadCondition(DataSource dataSource, Class modelClass) {
         this.dataSource = dataSource;
@@ -63,11 +64,11 @@ public class HeadCondition implements Condition {
         return modelClass;
     }
 
-    public int getQuerySize() {
-        return querySize;
+    public LimitWordCondition getLimitWordCondition() {
+        return limitWordCondition;
     }
 
-    public void setQuerySize(int querySize) {
-        this.querySize = querySize;
+    public void setLimitWordCondition(LimitWordCondition limitWordCondition) {
+        this.limitWordCondition = limitWordCondition;
     }
 }

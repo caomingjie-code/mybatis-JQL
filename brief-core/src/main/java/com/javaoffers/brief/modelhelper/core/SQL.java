@@ -1,6 +1,7 @@
 package com.javaoffers.brief.modelhelper.core;
 
 import com.javaoffers.brief.modelhelper.fun.ConditionTag;
+import com.javaoffers.brief.modelhelper.fun.condition.where.LimitWordCondition;
 import com.javaoffers.brief.modelhelper.utils.DBType;
 import com.javaoffers.brief.modelhelper.utils.SQLType;
 
@@ -23,7 +24,7 @@ public class SQL implements  BaseSQLInfo{
 	SQLType sqlType;
 	DBType dbType;
 	Consumer consumer;
-	private int querySize;
+	private Limit limit;
 	public SQL(DBType dbType, String sql , List<Object[]> argsParam) {
 		this.argsParam = argsParam;
 		this.sql = sql;
@@ -93,16 +94,15 @@ public class SQL implements  BaseSQLInfo{
 		clone.setSqlType(sqlType);
 		clone.setStreaming(consumer);
 		clone.setParamMap(paramMap);
-		clone.querySize(querySize);
+
 		return clone;
 	}
 
 	@Override
-	public int querySize() {
-		return querySize;
+	public Limit limit() {
+		return this.limit;
 	}
-
-	public void querySize(int querySize) {
-		this.querySize = querySize;
+	public void limit(Limit limit) {
+		this.limit = limit;
 	}
 }

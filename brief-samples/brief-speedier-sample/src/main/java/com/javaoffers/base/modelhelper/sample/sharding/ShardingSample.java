@@ -8,6 +8,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.List;
 
 public class ShardingSample {
     BriefSpeedier briefSpeedier = BriefSpeedierSample.getBriefSpeedier();
@@ -23,17 +24,19 @@ public class ShardingSample {
 
     @Test
     public void testShardingSampleIn(){
-        userBriefMapper.select().colAll().where()
+        List<ShardingUser> exs = userBriefMapper.select().colAll().where()
                 .in(ShardingUser::getBirthday, new Date(), new Date())
-                .eq(ShardingUser::getId,1)
+//                .eq(ShardingUser::getId, 1)
                 .exs();
+        System.out.println(exs.size());
     }
 
     @Test
     public void testShardingSampleIn2(){
-        userBriefMapper.select().colAll().where()
+        List<ShardingUser> exs = userBriefMapper.select().colAll().where()
                 .in(ShardingUser::getBirthday, new Date(), DateUtils.addDays(new Date(), -31))
-                .eq(ShardingUser::getId,1)
+//                .eq(ShardingUser::getId, 1)
                 .exs();
+        System.out.println(exs.size());
     }
 }

@@ -48,6 +48,7 @@
 
     <brief.version>3.6.3-SNAPSHOT</brief.version>
     <slf4j.version>1.7.18</slf4j.version>
+    <logback>1.2.3</logback>
     <junit.version>4.12</junit.version>
     <commons.lang3.version>3.12.0</commons.lang3.version>
     <byte.buddy.version>1.10.22</byte.buddy.version>

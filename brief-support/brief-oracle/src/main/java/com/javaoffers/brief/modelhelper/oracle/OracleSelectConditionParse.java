@@ -8,14 +8,16 @@ import java.util.LinkedList;
 
 public class OracleSelectConditionParse extends SelectConditionParse {
 
+    public static final StringBuilder oracleSelect = new StringBuilder("SELECT * FROM ( " +
+            "SELECT A.*, ROWNUM RN " +
+            "FROM ( ");
+
     @Override
     public void beforeSelectCol(LinkedList<Condition> conditions, StringBuilder selectCols) {
         //检测是否有分页
         Condition condition = conditions.peekLast();
         if(condition instanceof LimitWordCondition){
-            StringBuilder oracleSelect = new StringBuilder("SELECT * FROM ( " +
-                    "SELECT A.*, ROWNUM RN " +
-                    "FROM ( ");
+
 
             oracleSelect.append(selectCols);
             selectCols.delete(0, selectCols.length());

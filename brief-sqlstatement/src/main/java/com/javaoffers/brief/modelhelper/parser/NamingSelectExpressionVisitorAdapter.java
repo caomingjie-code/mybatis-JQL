@@ -40,11 +40,11 @@ public class NamingSelectExpressionVisitorAdapter extends ExpressionVisitorAdapt
         colNameProcessorInfo.setColumn(column);
         colNameProcessorInfo.setConditionName(conditionName);
         colNameProcessorInfo.setColumnIndex(whereIndex.getAndIncrement());
-        colNameProcessorInfo.setTableName(tableName);
         // 如果存在tableName不为空
         if (StringUtils.isNotBlank(tableName)) {
             //如果表与checkTableName相同，colName也相同
             if(namingContent.isProcessorTableName(tableName) && namingContent.isProcessorCloName(tableName, columnName)){
+                colNameProcessorInfo.setTableName(tableName);
                 namingContent.getProcessorByTableName(tableName).accept(colNameProcessorInfo);
                 //column.setColumnName("NAME");
             }
@@ -54,7 +54,7 @@ public class NamingSelectExpressionVisitorAdapter extends ExpressionVisitorAdapt
                 && !namingContent.isSubSelct()
                 && namingContent.isProcessorCloName(namingContent.getSimpleSingleTable(), columnName)
         ){
-
+            colNameProcessorInfo.setTableName(namingContent.getSimpleSingleTable());
             namingContent.getProcessorByTableName(namingContent.getSimpleSingleTable()).accept(colNameProcessorInfo);
             //column.setColumnName("NAME");
 
@@ -66,6 +66,7 @@ public class NamingSelectExpressionVisitorAdapter extends ExpressionVisitorAdapt
                 && ConditionName.SELECT_COL_NAME == conditionName
                 && namingContent.isProcessorCloName(namingContent.getSubSelectMainTable(), columnName)
         ) {
+            colNameProcessorInfo.setTableName(namingContent.getSubSelectMainTable());
             namingContent.getProcessorByTableName(namingContent.getSubSelectMainTable()).accept(colNameProcessorInfo);
             //column.setColumnName("NAME");
 
@@ -81,6 +82,7 @@ public class NamingSelectExpressionVisitorAdapter extends ExpressionVisitorAdapt
             Collection<String> values = namingContent.getTableNameMapper().values();
             for(String tableName0 : values){
                 if(namingContent.isProcessorCloName(tableName0, columnName )){
+                    colNameProcessorInfo.setTableName(tableName0);
                     namingContent.getProcessorByTableName(tableName0).accept(colNameProcessorInfo);
                     return;
                 }
@@ -96,6 +98,7 @@ public class NamingSelectExpressionVisitorAdapter extends ExpressionVisitorAdapt
             Collection<String> values = namingContent.getTableNameMapper().values();
             for(String tableName0 : values){
                 if(namingContent.isProcessorCloName(tableName0, columnName )){
+                    colNameProcessorInfo.setTableName(tableName0);
                     namingContent.getProcessorByTableName(tableName0).accept(colNameProcessorInfo);
                     return;
                 }

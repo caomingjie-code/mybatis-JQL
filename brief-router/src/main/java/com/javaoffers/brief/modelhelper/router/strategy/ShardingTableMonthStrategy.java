@@ -16,7 +16,7 @@ public class ShardingTableMonthStrategy implements ShardingTableStrategy<Date> {
 
     @Override
     public List<String> shardingTable(String tableName, String colName, ConditionTag conditionTag, List<Date> args) {
-        Set<String> set = new HashSet<>();
+        Set<String> set = new TreeSet<>();
         String originTableName = tableName;
         switch (conditionTag) {
             case EQ:

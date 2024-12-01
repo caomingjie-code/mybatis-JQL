@@ -59,6 +59,8 @@ public class NamingUpdateExpressionVisitorAdapter extends ExpressionVisitorAdapt
             colNameProcessorInfo.setConditionName(conditionName);
             Column column = new Column(new Table(this.namingContent.getUpdateTableName()), "?");
             colNameProcessorInfo.setColumn(column);
+            colNameProcessorInfo.setColumnIndex(whereIndex.getAndIncrement());
+            colNameProcessorInfo.setTableName(this.namingContent.getUpdateTableName());
             //上游有对table+colName的判断. 所以这里可以直接调用
             this.namingContent.getProcessorByTableName(this.namingContent.getUpdateTableName()).accept(colNameProcessorInfo);
             parameter.setTag(colNameProcessorInfo.getColumn().getColumnName());

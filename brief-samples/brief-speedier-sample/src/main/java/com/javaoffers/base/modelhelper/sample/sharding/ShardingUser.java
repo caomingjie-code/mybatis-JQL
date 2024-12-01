@@ -2,6 +2,7 @@ package com.javaoffers.base.modelhelper.sample.sharding;
 
 import com.javaoffers.brief.modelhelper.anno.BaseModel;
 import com.javaoffers.brief.modelhelper.anno.BaseUnique;
+import com.javaoffers.brief.modelhelper.anno.fun.params.Left;
 import com.javaoffers.brief.modelhelper.router.anno.ShardingStrategy;
 import com.javaoffers.brief.modelhelper.router.strategy.ShardingTableMonthStrategy;
 import lombok.Data;
