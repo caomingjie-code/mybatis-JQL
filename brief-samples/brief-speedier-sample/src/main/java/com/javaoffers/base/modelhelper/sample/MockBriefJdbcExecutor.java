@@ -3,6 +3,7 @@ package com.javaoffers.base.modelhelper.sample;
 import com.javaoffers.brief.modelhelper.core.BaseSQLInfo;
 import com.javaoffers.brief.modelhelper.core.Id;
 import com.javaoffers.brief.modelhelper.jdbc.JdbcExecutor;
+import com.javaoffers.brief.modelhelper.jdbc.JdbcExecutorMetadata;
 
 import java.util.Collections;
 import java.util.List;
@@ -42,5 +43,10 @@ public class MockBriefJdbcExecutor implements JdbcExecutor {
     @Override
     public void queryStream(BaseSQLInfo sql) {
        //NONE
+    }
+
+    @Override
+    public JdbcExecutorMetadata getMetadata() {
+        return null;
     }
 }

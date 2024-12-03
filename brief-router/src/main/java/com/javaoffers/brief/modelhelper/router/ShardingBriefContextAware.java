@@ -15,6 +15,7 @@ public class ShardingBriefContextAware implements BriefContextPostProcess {
 
     @Override
     public void postProcess(BriefContext briefContext) {
-        briefContext.setJdbcExecutorFactory(ShardingBriefJdbcExecutorFactory.instance);
+        JdbcExecutorFactory jdbcExecutorFactory = briefContext.getJdbcExecutorFactory();
+        briefContext.setJdbcExecutorFactory(new ShardingBriefJdbcExecutorFactory(jdbcExecutorFactory));
     }
 }

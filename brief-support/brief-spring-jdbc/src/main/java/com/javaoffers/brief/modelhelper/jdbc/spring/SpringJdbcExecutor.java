@@ -2,10 +2,7 @@ package com.javaoffers.brief.modelhelper.jdbc.spring;
 
 import com.javaoffers.brief.modelhelper.core.BaseSQLInfo;
 import com.javaoffers.brief.modelhelper.core.Id;
-import com.javaoffers.brief.modelhelper.jdbc.BriefModifyExecutor;
-import com.javaoffers.brief.modelhelper.jdbc.BriefQueryExecutor;
-import com.javaoffers.brief.modelhelper.jdbc.BriefSaveExecutor;
-import com.javaoffers.brief.modelhelper.jdbc.JdbcExecutor;
+import com.javaoffers.brief.modelhelper.jdbc.*;
 
 import javax.sql.DataSource;
 import java.util.List;
@@ -18,9 +15,12 @@ public class SpringJdbcExecutor<T> implements JdbcExecutor<T> {
 
     Class<T> modelClass;
 
+    JdbcExecutorMetadata jdbcExecutorMetadata;
+
     public SpringJdbcExecutor(DataSource dataSource, Class modelClass) {
         this.dataSource = dataSource;
         this.modelClass = modelClass;
+        this.jdbcExecutorMetadata = new JdbcExecutorMetadata(dataSource, modelClass);
     }
 
     @Override
@@ -56,6 +56,11 @@ public class SpringJdbcExecutor<T> implements JdbcExecutor<T> {
     @Override
     public void queryStream(BaseSQLInfo sql) {
         new SpringQueryExecutor<T>(dataSource, modelClass).queryStream(sql);
+    }
+
+    @Override
+    public JdbcExecutorMetadata getMetadata() {
+        return this.jdbcExecutorMetadata;
     }
 
 

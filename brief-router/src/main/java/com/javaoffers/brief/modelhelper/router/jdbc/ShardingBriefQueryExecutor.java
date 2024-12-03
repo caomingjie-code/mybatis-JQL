@@ -6,6 +6,8 @@ import com.javaoffers.brief.modelhelper.exception.ParseResultSetException;
 import com.javaoffers.brief.modelhelper.exception.SqlParseException;
 import com.javaoffers.brief.modelhelper.exception.StopExecException;
 import com.javaoffers.brief.modelhelper.jdbc.BriefResultSetExecutor;
+import com.javaoffers.brief.modelhelper.jdbc.JdbcExecutor;
+import com.javaoffers.brief.modelhelper.jdbc.JdbcExecutorMetadata;
 import com.javaoffers.brief.modelhelper.jdbc.QueryExecutor;
 import com.javaoffers.brief.modelhelper.log.JqlLogger;
 import com.javaoffers.brief.modelhelper.parse.ModelParseUtils;
@@ -28,13 +30,18 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ShardingBriefQueryExecutor<T> implements QueryExecutor<T> {
 
-    DataSource dataSource;
+    JdbcExecutor jdbcExecutor;
+    JdbcExecutorMetadata metadata;
+    TableInfo tableInfo;
+    ShardingTableColumInfo stc ;
+    boolean sharding = false;
 
-    Class<T> modelClass;
-
-    public ShardingBriefQueryExecutor(DataSource dataSource, Class modelClass) {
-        this.dataSource = dataSource;
-        this.modelClass = modelClass;
+    public ShardingBriefQueryExecutor(JdbcExecutor jdbcExecutor) {
+        this.jdbcExecutor = jdbcExecutor;
+        this.metadata = this.jdbcExecutor.getMetadata();
+        this.tableInfo = TableHelper.getTableInfo(metadata.getModelClass());
+        this.stc = (ShardingTableColumInfo)tableInfo.getDeriveColName(ShardingDeriveFlag.SHARDING_TABLE);
+        this.sharding = this.stc != null;
     }
 
     @Override
@@ -70,8 +77,7 @@ public class ShardingBriefQueryExecutor<T> implements QueryExecutor<T> {
 
     @Override
     public void queryStream(BaseSQLInfo sql) {
-        TableInfo tableInfo = TableHelper.getTableInfo(this.modelClass);
-        ShardingTableColumInfo stc = (ShardingTableColumInfo)tableInfo.getDeriveColName(ShardingDeriveFlag.SHARDING_TABLE);
+
         try {
             if(stc != null) {
                 List<BaseSQLInfo> baseSQLInfos = stc.shardingParse(sql);
@@ -93,51 +99,12 @@ public class ShardingBriefQueryExecutor<T> implements QueryExecutor<T> {
     private void normal(BaseSQLInfo sql) {
         JqlLogger.infoSql("SHARDING SQL: {}", sql.getSql());
         JqlLogger.infoSql("SHARDING PAM: {}", sql.getParams());
-        boolean oldAutoCommitStatus = false;
-        Connection connection = null;
-        try {
-            connection = getConnection();
-            oldAutoCommitStatus = connection.getAutoCommit();
-            PreparedStatement ps = connection.prepareStatement(sql.getSql());
-            List<Object[]> argsParam = sql.getArgsParam();
-            if (argsParam != null && argsParam.size() == 1) {
-                Object[] ov = argsParam.get(0);
-                for (int i = 0; i < ov.length; ) {
-                    Object o = ov[i];
-                    ps.setObject(++i, o);
-                }
-            }
-            switch (sql.getSqlType()) {
-                case JOIN_SELECT:
-                    ModelParseUtils.converterResultSet2ModelForJoinSelectStream(this.modelClass,
-                            new BriefResultSetExecutor(ps.executeQuery()), sql.getStreaming());
-                    break;
-                case NORMAL_SELECT:
-                    ModelParseUtils.converterResultSet2ModelForNormalSelectStream(this.modelClass,
-                            new BriefResultSetExecutor(ps.executeQuery()), sql.getStreaming());
-                    break;
-                default:
-                    throw new ParseResultSetException("sql type does not exist for streaming process");
-            }
-        } catch (Exception e) {
-            if(e instanceof StopExecException){
-                throw (StopExecException)e;
-            }
-            e.printStackTrace();
-            throw new SqlParseException(e.getMessage());
-        } finally {
-            closeConnection(connection, oldAutoCommitStatus);
-        }
+
     }
+
 
     @Override
     public Connection getConnection() {
-        try {
-            return this.dataSource.getConnection();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new SqlParseException(e.getMessage());
-        }
-
+        return null;
     }
 }

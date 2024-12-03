@@ -10,10 +10,12 @@ import javax.sql.DataSource;
  */
 public class ShardingBriefJdbcExecutorFactory implements JdbcExecutorFactory {
 
-    public static final ShardingBriefJdbcExecutorFactory instance = new ShardingBriefJdbcExecutorFactory();
-
+    private JdbcExecutorFactory jdbcExecutorFactory;
+    public ShardingBriefJdbcExecutorFactory(JdbcExecutorFactory jdbcExecutorFactory) {
+        this.jdbcExecutorFactory = jdbcExecutorFactory;
+    }
     @Override
     public <T> JdbcExecutor<T> createJdbcExecutor(DataSource dataSource, Class<T> modelClass) {
-        return new ShardingBriefJdbcExecutor<T>(dataSource, modelClass);
+        return new ShardingBriefJdbcExecutor<T>(jdbcExecutorFactory.createJdbcExecutor(dataSource, modelClass),modelClass);
     }
 }

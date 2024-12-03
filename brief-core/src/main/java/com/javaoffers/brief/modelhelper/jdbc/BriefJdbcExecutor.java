@@ -17,9 +17,12 @@ public class BriefJdbcExecutor<T> implements JdbcExecutor<T> {
 
     Class<T> modelClass;
 
+    JdbcExecutorMetadata jdbcExecutorMetadata;
+
     public BriefJdbcExecutor(DataSource dataSource, Class<T> modelClass) {
         this.dataSource = dataSource;
         this.modelClass = modelClass;
+        this.jdbcExecutorMetadata = new JdbcExecutorMetadata(dataSource, modelClass);
     }
 
     @Override
@@ -55,5 +58,10 @@ public class BriefJdbcExecutor<T> implements JdbcExecutor<T> {
     @Override
     public void queryStream(BaseSQLInfo sql) {
         new BriefQueryExecutor<T>(dataSource, modelClass).queryStream(sql);
+    }
+
+    @Override
+    public JdbcExecutorMetadata getMetadata() {
+        return jdbcExecutorMetadata;
     }
 }
