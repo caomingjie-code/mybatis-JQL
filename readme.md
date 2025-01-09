@@ -25,7 +25,7 @@ This is the reason for the existence of the <code>brief</code>. <code>brief</cod
 
   ```java
     <properties>
-         <brief.version>3.6.7</brief.version>
+         <brief.version>3.6.8</brief.version>
     </properties>
    <!--brief Lightweight and can be used alone-->
      <dependency>
